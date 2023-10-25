@@ -1,4 +1,4 @@
-# Функція для S-блоку
+# Функція для S-блоку (пряме перетворення)
 def s_block(input_data, s_box):
     output_data = []
     for byte in input_data:
@@ -6,7 +6,7 @@ def s_block(input_data, s_box):
         output_data.append(output_byte)
     return output_data
 
-# Функція для зворотного S-блоку
+# Функція для S-блоку (зворотне перетворення)
 def reverse_s_block(input_data, reverse_s_box):
     output_data = []
     for byte in input_data:
@@ -14,7 +14,7 @@ def reverse_s_block(input_data, reverse_s_box):
         output_data.append(output_byte)
     return output_data
 
-# Функція для P-блоку
+# Функція для P-блоку (пряме перетворення)
 def p_block(input_data, permutation_formula):
     output_data = []
     for index in permutation_formula:
@@ -22,7 +22,7 @@ def p_block(input_data, permutation_formula):
         output_data.append(output_byte)
     return output_data
 
-# Функція для зворотного P-блоку
+# Функція для P-блоку (зворотне перетворення)
 def reverse_p_block(input_data, reverse_permutation_formula):
     output_data = []
     for index in reverse_permutation_formula:
@@ -32,4 +32,13 @@ def reverse_p_block(input_data, reverse_permutation_formula):
 
 # Приклади використання
 s_box = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]  # Таблиця констант S-блоку
-reverse_s_box = [15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3
+reverse_s_box = [15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]  # Таблиця зворотних констант S-блоку
+permutation_formula = [3, 2, 1, 0]  # Формула перестановки для P-блоку
+reverse_permutation_formula = [0, 1, 2, 3]  # Формула зворотної перестановки для P-блоку
+
+input_data = [0, 1, 2, 3]
+output_s = s_block(input_data, s_box)
+print("Output after S-block:", output_s)
+
+output_p = p_block(input_data, permutation_formula)
+print("Output after P-block:", output_p)
