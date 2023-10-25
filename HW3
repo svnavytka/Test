@@ -1,0 +1,35 @@
+# Функція для S-блоку
+def s_block(input_data, s_box):
+    output_data = []
+    for byte in input_data:
+        output_byte = s_box[byte]  # Замінюємо байт за таблицею констант
+        output_data.append(output_byte)
+    return output_data
+
+# Функція для зворотного S-блоку
+def reverse_s_block(input_data, reverse_s_box):
+    output_data = []
+    for byte in input_data:
+        output_byte = reverse_s_box[byte]  # Замінюємо байт за таблицею зворотних констант
+        output_data.append(output_byte)
+    return output_data
+
+# Функція для P-блоку
+def p_block(input_data, permutation_formula):
+    output_data = []
+    for index in permutation_formula:
+        output_byte = input_data[index]  # Переставляємо байти за формулою перестановки
+        output_data.append(output_byte)
+    return output_data
+
+# Функція для зворотного P-блоку
+def reverse_p_block(input_data, reverse_permutation_formula):
+    output_data = []
+    for index in reverse_permutation_formula:
+        output_byte = input_data[index]  # Переставляємо байти за формулою зворотної перестановки
+        output_data.append(output_byte)
+    return output_data
+
+# Приклади використання
+s_box = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]  # Таблиця констант S-блоку
+reverse_s_box = [15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3
