@@ -1,0 +1,93 @@
+import hashlib
+
+def custom_sha256(data):
+    # Ініціалізуємо початкові значення
+    h0 = 0x6a09e667
+    h1 = 0xbb67ae85
+    h2 = 0x3c6ef372
+    h3 = 0xa54ff53a
+    h4 = 0x510e527f
+    h5 = 0x9b05688c
+    h6 = 0x1f83d9ab
+    h7 = 0x5be0cd19
+
+    # Визначаємо функції для роботи з бітами
+    def rotr(x, n):
+        return (x >> n) | (x << (32 - n))
+
+    def ch(x, y, z):
+        return (x & y) ^ (~x & z)
+
+    def maj(x, y, z):
+        return (x & y) ^ (x & z) ^ (y & z)
+
+    def big_sigma0(x):
+        return rotr(x, 2) ^ rotr(x, 13) ^ rotr(x, 22)
+
+    def big_sigma1(x):
+        return rotr(x, 6) ^ rotr(x, 11) ^ rotr(x, 25)
+
+    def small_sigma0(x):
+        return rotr(x, 7) ^ rotr(x, 18) ^ (x >> 3)
+
+    def small_sigma1(x):
+        return rotr(x, 17) ^ rotr(x, 19) ^ (x >> 10)
+
+    # Перетворюємо вхідні дані в байти
+    data = bytearray(data, 'utf-8')
+
+    # Доповнюємо дані за алгоритмом
+    data_len = len(data) * 8
+    data.append(0x80)
+    while (len(data) * 8) % 512 != 448:
+        data.append(0x00)
+    data += data_len.to_bytes(8, byteorder='big')
+
+    # Розділяємо дані на блоки
+    blocks = [data[i:i+64] for i in range(0, len(data), 64)]
+
+    for block in blocks:
+        words = [int.from_bytes(block[i:i+4], byteorder='big') for i in range(0, 64, 4)]
+
+        for i in range(16, 64):
+            s0 = small_sigma0(words[i-15])
+            s1 = small_sigma1(words[i-2])
+            words.append((words[i-16] + s0 + words[i-7] + s1) & 0xFFFFFFFF)
+
+        a, b, c, d, e, f, g, h = h0, h1, h2, h3, h4, h5, h6, h7
+
+        for i in range(64):
+            S1 = big_sigma1(e)
+            ch_result = ch(e, f, g)
+            temp1 = (h + S1 + ch_result + k[i] + words[i]) & 0xFFFFFFFF
+            S0 = big_sigma0(a)
+            maj_result = maj(a, b, c)
+            temp2 = (S0 + maj_result) & 0xFFFFFFFF
+
+            h = g
+            g = f
+            f = e
+            e = (d + temp1) & 0xFFFFFFFF
+            d = c
+            c = b
+            b = a
+            a = (temp1 + temp2) & 0xFFFFFFFF
+
+        h0 = (h0 + a) & 0xFFFFFFFF
+        h1 = (h1 + b) & 0xFFFFFFFF
+        h2 = (h2 + c) & 0xFFFFFFFF
+        h3 = (h3 + d) & 0xFFFFFFFF
+        h4 = (h4 + e) & 0xFFFFFFFF
+        h5 = (h5 + f) & 0xFFFFFFFF
+        h6 = (h6 + g) & 0xFFFFFFFF
+        h7 = (h7 + h) & 0xFFFFFFFF
+
+    # Об'єднуємо результати
+    result = (h0 << 224) | (h1 << 192) | (h2 << 160) | (h3 << 128) | (h4 << 96) | (h5 << 64) | (h6 << 32) | h7
+
+    return hex(result)[2:]
+
+# Приклад використання
+message = "Hello, World!"
+hashed = custom_sha256(message)
+print("Hash:", hashed)
