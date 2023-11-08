@@ -1,0 +1,24 @@
+import hashlib
+
+def custom_sha256(data):
+    # Ваша реалізація SHA-256
+
+def test_hash_equality():
+    messages = ["Hello, World!", "This is a test message.", "1234567890" * 100]
+    
+    for message in messages:
+        # Ваша реалізація геш-функції
+        custom_hash = custom_sha256(message)
+        
+        # Бібліотечна реалізація геш-функції
+        library_hash = hashlib.sha256(message.encode()).hexdigest()
+        
+        if custom_hash == library_hash:
+            print(f"Message: '{message}' - Hashes match.")
+        else:
+            print(f"Message: '{message}' - Hashes do not match.")
+            print(f"Custom Hash: {custom_hash}")
+            print(f"Library Hash: {library_hash}")
+
+if __name__ == "__main__":
+    test_hash_equality()
