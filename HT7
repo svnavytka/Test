@@ -1,0 +1,99 @@
+package ellipticwrapper
+
+import (
+	"crypto/elliptic"
+	"crypto/ecdsa"
+	"crypto/rand"
+	"encoding/json"
+	"fmt"
+	"math/big"
+)
+
+// ECPoint represents a point on the elliptic curve.
+type ECPoint struct {
+	X *big.Int
+	Y *big.Int
+}
+
+// BasePointGGet returns the generator point of the selected elliptic curve.
+func BasePointGGet(curve elliptic.Curve) (point ECPoint) {
+	return ECPoint{curve.Params().Gx, curve.Params().Gy}
+}
+
+// ECPointGen creates a new point on the elliptic curve.
+func ECPointGen(curve elliptic.Curve, x, y *big.Int) (point ECPoint) {
+	return ECPoint{x, y}
+}
+
+// IsOnCurveCheck checks if a point is on the elliptic curve.
+func IsOnCurveCheck(curve elliptic.Curve, a ECPoint) (c bool) {
+	return curve.IsOnCurve(a.X, a.Y)
+}
+
+// AddECPoints adds two points on the elliptic curve.
+func AddECPoints(curve elliptic.Curve, a, b ECPoint) (c ECPoint) {
+	x, y := curve.Add(a.X, a.Y, b.X, b.Y)
+	return ECPoint{x, y}
+}
+
+// DoubleECPoints doubles a point on the elliptic curve.
+func DoubleECPoints(curve elliptic.Curve, a ECPoint) (c ECPoint) {
+	x, y := curve.Double(a.X, a.Y)
+	return ECPoint{x, y}
+}
+
+// ScalarMult multiplies a point on the elliptic curve by a scalar.
+func ScalarMult(curve elliptic.Curve, k *big.Int, a ECPoint) (c ECPoint) {
+	x, y := curve.ScalarMult(a.X, a.Y, k.Bytes())
+	return ECPoint{x, y}
+}
+
+// ECPointToString serializes a point to a JSON string.
+func ECPointToString(a ECPoint) (s string) {
+	data, err := json.Marshal(a)
+	if err != nil {
+		panic(err)
+	}
+	return string(data)
+}
+
+// StringToECPoint deserializes a point from a JSON string.
+func StringToECPoint(s string) (point ECPoint) {
+	err := json.Unmarshal([]byte(s), &point)
+	if err != nil {
+		panic(err)
+	}
+	return point
+}
+
+// PrintECPoint prints the coordinates of a point.
+func PrintECPoint(a ECPoint) {
+	fmt.Printf("X: %v\nY: %v\n", a.X, a.Y)
+}
+
+// Example of usage:
+// func main() {
+// 	curve := elliptic.P256() // Use your elliptic curve of choice
+
+// 	basePoint := BasePointGGet(curve)
+// 	PrintECPoint(basePoint)
+
+// 	randomPoint, _ := rand.Int(rand.Reader, curve.Params().P)
+// 	randomECPoint := ECPointGen(curve, randomPoint, randomPoint)
+// 	PrintECPoint(randomECPoint)
+
+// 	sum := AddECPoints(curve, basePoint, randomECPoint)
+// 	PrintECPoint(sum)
+
+// 	double := DoubleECPoints(curve, randomECPoint)
+// 	PrintECPoint(double)
+
+// 	scalarMult := ScalarMult(curve, randomPoint, basePoint)
+// 	PrintECPoint(scalarMult)
+
+// 	serialized := ECPointToString(randomECPoint)
+// 	fmt.Println("Serialized:", serialized)
+
+// 	deserialized := StringToECPoint(serialized)
+// 	PrintECPoint(deserialized)
+// }
