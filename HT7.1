@@ -1,0 +1,50 @@
+package main
+
+import (
+	"crypto/elliptic"
+	"crypto/rand"
+	"fmt"
+	"math/big"
+)
+
+func main() {
+	curve := elliptic.P256() // Ваша крива вибору
+
+	G := BasePointGGet(curve)
+	k := SetRandom(256)
+	d := SetRandom(256)
+
+	H1 := ScalarMult(curve, d, G)
+	H2 := ScalarMult(curve, k, H1)
+
+	H3 := ScalarMult(curve, k, G)
+	H4 := ScalarMult(curve, d, H3)
+
+	result := IsEqual(H2, H4)
+
+	fmt.Println("Result:", result)
+}
+
+// BasePointGGet повертає базову точку генератора обраної кривої
+func BasePointGGet(curve elliptic.Curve) (point ECPoint) {
+	return ECPoint{curve.Params().Gx, curve.Params().Gy}
+}
+
+// SetRandom генерує випадкове ціле число заданого розміру біт
+func SetRandom(bitSize int) *big.Int {
+	random, _ := rand.Int(rand.Reader, new(big.Int).Exp(big.NewInt(2), big.NewInt(int64(bitSize)), nil))
+	return random
+}
+
+// ScalarMult перемножає точку на еліптичній криві на скаляр
+func ScalarMult(curve elliptic.Curve, k *big.Int, a ECPoint) (c ECPoint) {
+	x, y := curve.ScalarMult(a.X, a.Y, k.Bytes())
+	return ECPoint{x, y}
+}
+
+// IsEqual перевіряє, чи рівні дві точки
+func IsEqual(a, b ECPoint) bool {
+	return a.X.Cmp(b.X) == 0 && a.Y.Cmp(b.Y) == 0
+}
+
+// Ваша реалізація структури ECPoint та інших обгорток функцій
